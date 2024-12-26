@@ -8,7 +8,7 @@ $ tar -xvzf bitcoin-27.0-x86_64-linux-gnu.tar.gz
 $ cd bitcoin-27.0
 $ sudo cp bin/* /usr/local/bin 
 $ mkdir ~/.bitcoin
-$ cp .bitcoin.conf ~/.bitcoin
+$ cp bitcoin.conf ~/.bitcoin
 $ cd ~/.bitcoin
 ```
 Add the following lines to the end of ~/.bitcon/bitcoin.conf
