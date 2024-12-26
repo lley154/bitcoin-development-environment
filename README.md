@@ -1,4 +1,5 @@
-# Bitcoin Development Setup
+# Bitcoin Development Environment
+## Setup
 Connect and log into the docker Ubuntu 24.10 Linux container with the user created in [Docker Setup](https://github.com/lley154/docker-setup).
 ```
 $ sudo apt install curl -y
@@ -138,9 +139,150 @@ $ bitcoin-cli -regtest getwalletinfo
 $ bitcoin-cli -regtest getbalance
 12462.50000000
 ```
-To stop the network, use the following command
+To stop the network, use the following command.
 ```
 $ bitcoin-cli -regtest stop
 Bitcoin Core stopping
+```
+
+## Create a transaction
+```
+$ bitcoind -regtest -debug
+Bitcoin Core starting
+
+$ bitcoin-cli -regtest getbalance
+12462.50000000
+```
+List unspent transactions to get inputs
+```
+bitcoin-cli -regtest listunspent
+[  {
+    "txid": "a6629793807cacb30428f01eb4ea5e8abac03841cda179563e1d4131b9ce0d8c",
+    "vout": 0,
+    "address": "bcrt1qqtmnssy8vzcd3uw27rhly3st20wwj4ehulauue",
+    "label": "",
+    "scriptPubKey": "001402f738408760b0d8f1caf0eff2460b53dce95737",
+    "amount": 12.50000000,
+    "confirmations": 196,
+    "spendable": true,
+    "solvable": true,
+    "desc": "wpkh([6ccc2364/84h/1h/0h/0/0]02829d209e0b5179c6eaba4130f6226c6b916efed611442982b905680ef39ff11e)#rakema5w",
+    "parent_descs": [
+      "wpkh(tpubD6NzVbkrYhZ4XKKfkV8hJWiuYzbobpv9tnLLpPNtVmG1d8Z4qVy66RUGgssosvA5xzX8n15e4CgaDuihcY55277gir5bhJqVc8nJsBFRWid/84h/1h/0h/0/*)#l4a8ewww"
+    ],
+    "safe": true
+  }
+]
+```
+Get a new address
+```
+$ bitcoin-cli -regtest getnewaddress
+bcrt1qrmrfkjrn9qrr39y7wcqknj8d7y8pp3nepjc0ql
+```
+Send 0.01 BTC to the new address.
+```
+$ bitcoin-cli -regtest sendtoaddress bcrt1qrmrfkjrn9qrr39y7wcqknj8d7y8pp3nepjc0ql 0.01
+0fdf5c71c2128f57baeb524cce86528b13a18c755c9296c06da21598c458a237
+```
+Look at the mempool to see the transaction waiting to be picked up
+```
+$ bitcoin-cli -regtest getmempoolinfo
+{
+  "loaded": true,
+  "size": 1,
+  "bytes": 141,
+  "usage": 1152,
+  "total_fee": 0.00001410,
+  "maxmempool": 300000000,
+  "mempoolminfee": 0.00001000,
+  "minrelaytxfee": 0.00001000,
+  "incrementalrelayfee": 0.00001000,
+  "unbroadcastcount": 1,
+  "fullrbf": false
+}
+
+$ bitcoin-cli -regtest getrawmempool true
+{
+  "0fdf5c71c2128f57baeb524cce86528b13a18c755c9296c06da21598c458a237": {
+    "vsize": 141,
+    "weight": 561,
+    "time": 1734971000,
+    "height": 501,
+    "descendantcount": 1,
+    "descendantsize": 141,
+    "ancestorcount": 1,
+    "ancestorsize": 141,
+    "wtxid": "38aef2a9e7ead02f6f39ee82284daa3dbb3aee99c615eafd5cd10713246d7ea4",
+    "fees": {
+      "base": 0.00001410,
+      "modified": 0.00001410,
+      "ancestor": 0.00001410,
+      "descendant": 0.00001410
+    },
+    "depends": [
+    ],
+    "spentby": [
+    ],
+    "bip125-replaceable": true,
+    "unbroadcast": true
+  }
+}
+```
+
+Let's look at the transaction details.
+```
+$ bitcoin-cli -regtest getrawtransaction 0fdf5c71c2128f57baeb524cce86528b13a18c755c9296c06da21598c458a237 true
+{
+  "txid": "0fdf5c71c2128f57baeb524cce86528b13a18c755c9296c06da21598c458a237",
+  "hash": "e0054e546b37a2c6e6ef1342842ac81c5e2c3b356b1a9dde002eafd369e203b7",
+  "version": 2,
+  "size": 222,
+  "vsize": 141,
+  "weight": 561,
+  "locktime": 500,
+  "vin": [
+    {
+      "txid": "db02524b5a26253fcc2d38a1a76c0853d18e43a73a723b29b23d0705453a144c",
+      "vout": 0,
+      "scriptSig": {
+        "asm": "",
+        "hex": ""
+      },
+      "txinwitness": [
+        "3044022069630604ff6035eba1228d0988065226e52e8b7f2b9cd71a986b98566847a6b40220522c66234f158c24eaada5a7dd63b3fa49d9a0980a37c13a151f10c9258ec15701",
+        "028140e9f5a5cfa84fdc765a025ef13dc03bccdb17ab9d96b2beb8ba2ca91e18cf"
+      ],
+      "sequence": 4294967293
+    }
+  ],
+  "vout": [
+    {
+      "value": 12.39998590,
+      "n": 0,
+      "scriptPubKey": {
+        "asm": "0 adef5d56f757b4dc311c723820482440c8e0279f",
+        "desc": "addr(bcrt1q4hh464hh276dcvguwguzqjpygrywqful2n9sz2)#ywy60d7k",
+        "hex": "0014adef5d56f757b4dc311c723820482440c8e0279f",
+        "address": "bcrt1q4hh464hh276dcvguwguzqjpygrywqful2n9sz2",
+        "type": "witness_v0_keyhash"
+      }
+    },
+    {
+      "value": 0.10000000,
+      "n": 1,
+      "scriptPubKey": {
+        "asm": "0 17d15f65985397e5b40da2a1dedb404e19ad0554",
+        "desc": "addr(bcrt1qzlg47evc2wt7tdqd52saak6qfcv66p25rj5nja)#u5g6j4he",
+        "hex": "001417d15f65985397e5b40da2a1dedb404e19ad0554",
+        "address": "bcrt1qzlg47evc2wt7tdqd52saak6qfcv66p25rj5nja",
+        "type": "witness_v0_keyhash"
+      }
+    }
+  ],
+  "hex": "020000000001014c143a4505073db2293b723aa7438ed153086ca7a1382dcc3f25265a4b5202db0000000000fdffffff027ee0e84900000000160014adef5d56f757b4dc311c723820482440c8e0279f809698000000000016001417d15f65985397e5b40da2a1dedb404e19ad055402473044022069630604ff6035eba1228d0988065226e52e8b7f2b9cd71a986b98566847a6b40220522c66234f158c24eaada5a7dd63b3fa49d9a0980a37c13a151f10c9258ec1570121028140e9f5a5cfa84fdc765a025ef13dc03bccdb17ab9d96b2beb8ba2ca91e18cff4010000"
+}
+```
+
+
 ```
 
